@@ -230,7 +230,8 @@ MenuNode *menu_TranslateNode(xmlNode *node) {
     }
 
     if(node->type == XML_ELEMENT_NODE) {
-	xmlAttr *current, *child;
+	xmlAttr *current;
+	xmlNode *child; /* node->children is xmlNode*, not xmlAttr*. */
 	tnode = create_empty_node();
 
 	for(current = node->properties; current; current = current->next) {
@@ -421,6 +422,14 @@ void T4K_UnloadMenus(void)
 }
 
 
+/* Adapter: T4K_PrerenderAll is void(void); ResSwitchCallback is void(int,int). */
+static void menu_prerender_thunk(int w, int h)
+{
+    (void)w;
+    (void)h;
+    T4K_PrerenderAll();
+}
+
 /*
    RunMenu - main function to display the menu and run the event loop
    if return_choice = true then return chosen value instead of
@@ -455,7 +464,7 @@ int T4K_RunMenu(int index, bool return_choice, void (*draw_background)(), int (*
     int click_flag = 1;
     int using_scroll = 0;
 
-    internal_res_switch_handler(&T4K_PrerenderAll);
+    internal_res_switch_handler(menu_prerender_thunk);
 
     for(;;) /* one loop body execution for one menu page */
     {

@@ -67,6 +67,9 @@ int main(int argc, char** argv)
     ADD_TEST(suite, test_T4K_CheckFile);
     ADD_TEST(suite, test_T4K_RemoveSlash);
     ADD_TEST(suite, test_T4K_SetRect);
+    ADD_TEST(suite, test_T4K_LineWrap);
+    ADD_TEST(suite, test_T4K_LineWrapInsBreaks);
+    ADD_TEST(suite, test_T4K_LineWrapList);
 
     err = CU_basic_run_suite(suite);
     if (err != CUE_SUCCESS)

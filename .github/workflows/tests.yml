@@ -4,34 +4,53 @@ on:
 
 jobs:
   build:
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-24.04
     name: Build
     strategy:
       matrix:
         tts: [espeak, espeak-ng, speech-dispatcher]
     steps:
-      - name: System dependencies
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Install system dependencies
         run: |
           sudo apt-get update
           sudo apt-get install -y \
             autopoint \
-            doxygen  \
+            doxygen \
+            libcunit1-dev \
             libespeak-dev \
             libespeak-ng-dev \
             libpng-dev \
             librsvg2-dev \
+            libsdl1.2-dev \
             libsdl-image1.2-dev \
             libsdl-mixer1.2-dev \
             libsdl-net1.2-dev \
             libsdl-pango-dev \
+            libsdl-ttf2.0-dev \
             libspeechd-dev \
             libxml2-dev
-      - name: Checkout
-        uses: actions/checkout@v2
-      - name: Build
+
+      - name: Build and install library
         run: |
           autoreconf -i
-          # Disable all, enable just the
-          ./configure --without-espeak --without-espeak-ng --without-speech-dispatcher --with-${{ matrix.tts }}
-          # TODO: wire up src/tests to main build system
-          make check
+          ./configure \
+            --without-espeak \
+            --without-espeak-ng \
+            --without-speech-dispatcher \
+            --with-${{ matrix.tts }}
+          make
+          sudo make install
+          sudo ldconfig
+
+      - name: Build and run unit tests
+        run: |
+          cd src/tests
+          make CUNITINC=/usr/include \
+               CUNITLIB=/usr/lib/x86_64-linux-gnu \
+               T4KCOMMONINC=.. \
+               LIBS="-lt4k_common -lcunit $(pkg-config --libs sdl SDL_ttf)" \
+               INC="-I/usr/include $(pkg-config --cflags sdl) -I.."
+          ./unittest

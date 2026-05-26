@@ -7,7 +7,7 @@ EXEC = unittest
 CUNITINC = $(CURDIR)/CUnit/include
 CUNITLIB = $(CURDIR)/CUnit/lib
 T4KCOMMONINC = $(CURDIR)/..
-LIBS = -lSDL -lSDL_ttf -lSDL_Pango -lt4k_common -L$(CUNITLIB) -lcunit
+LIBS = -lt4k_common -L$(CUNITLIB) -lcunit $(shell pkg-config --libs sdl SDL_ttf)
 INC = -I$(CUNITINC) `pkg-config --cflags sdl` -I$(T4KCOMMONINC)
 
 

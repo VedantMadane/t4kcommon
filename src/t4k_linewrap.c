@@ -32,7 +32,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.  */
 #include <stdio.h>
 
 static char wrapped_lines0[MAX_LINES][MAX_LINEWIDTH];  // for internal storage
-char wrapped_lines[MAX_LINES][MAX_LINEWIDTH]; // publicly available!
+char wrapped_lines[MAX_LINES][MAX_LINEWIDTH]; // publicly available; declared extern in t4k_common.h
 
 
 
@@ -151,9 +151,9 @@ int T4K_LineWrapInsBreaks(const char* input, char* output,
 
 
 
-void T4K_LineWrapList(const char input[MAX_LINES][MAX_LINEWIDTH],
-	char str_list[MAX_LINES][MAX_LINEWIDTH],
-	int width, int max_lines, int max_width)
+void T4K_LineWrapList(const char input[][MAX_LINEWIDTH],
+                      char str_list[][MAX_LINEWIDTH], int width,
+                      int max_lines, int max_width)
 {
     int inputIndex;
     int outputIndex;

@@ -1940,12 +1940,9 @@ int T4K_LineWrapInsBreaks( const char* input,
 //! /return
 //!     None
 //!
-void T4K_LineWrapList( const char input[MAX_LINES][MAX_LINEWIDTH],
-                       char       str_list[MAX_LINES][MAX_LINEWIDTH],
-                       int        width,
-                       int        max_lines,
-                       int        max_width
-                     );
+void T4K_LineWrapList(const char input[][MAX_LINEWIDTH],
+                      char str_list[][MAX_LINEWIDTH], int width,
+                      int max_lines, int max_width);
 
 
 //=============================================================================

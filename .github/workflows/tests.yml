@@ -30,48 +30,37 @@ jobs:
             libsdl-mixer1.2-dev \
             libsdl-net1.2-dev \
             libsdl-pango-dev \
+            libsdl-ttf2.0-dev \
             libspeechd-dev \
             libxml2-dev
 
-      - name: Build library (with coverage instrumentation)
+      - name: Build library
         run: |
           autoreconf -i
           ./configure \
             --without-espeak \
             --without-espeak-ng \
             --without-speech-dispatcher \
-            --with-${{ matrix.tts }} \
-            CFLAGS="-g -O0 --coverage" \
-            LDFLAGS="--coverage"
+            --with-${{ matrix.tts }}
           make
 
-      - name: Build and run unit tests
+      - name: Build and run unit tests (with coverage)
         run: |
           cd src/tests
           make CUNITINC=/usr/include \
                CUNITLIB=/usr/lib/x86_64-linux-gnu \
                T4KCOMMONINC=.. \
                CFLAGS="-g -O0 --coverage" \
-               LIBS="-L../../.libs -lt4k_common -lcunit $(pkg-config --libs sdl SDL_ttf) --coverage" \
+               LIBS="-L../.libs -lt4k_common -lcunit $(pkg-config --libs sdl SDL_ttf) --coverage" \
                INC="-I/usr/include $(pkg-config --cflags sdl) -I.."
-          LD_LIBRARY_PATH=../../.libs ./unittest
+          LD_LIBRARY_PATH=../.libs ./unittest
 
       - name: Generate coverage report
         run: |
-          # Capture coverage data from all instrumented sources
-          lcov --capture --directory . --output-file coverage_all.info
-          # Strip system headers and bundled gnulib from the report;
-          # keep only the library's own sources (src/t4k_*.c)
-          lcov --remove coverage_all.info \
-               '/usr/*' \
-               '*/gnulib/*' \
-               '*/tests/main.c' \
-               '*/tests/test_public_functions.c' \
-               --output-file coverage.info
-          # Print summary — advisory only, never blocks the build
+          lcov --capture --directory src/tests --output-file coverage.info
           lcov --summary coverage.info || true
 
-      - name: Upload coverage data
+      - name: Upload coverage artifact
         uses: actions/upload-artifact@v4
         with:
           name: coverage-${{ matrix.tts }}
